@@ -1,5 +1,5 @@
 /*
-CSC3916 HW2
+CSC3916 HW3
 File: Server.js
 Description: Web API scaffolding for Movie API
  */
@@ -85,6 +85,88 @@ router.post('/signin', function (req, res) {
         })
     })
 });
+
+router.get('/movies', function (req, res) {
+    Movie.find({}, function(err, movies) {
+        if (err) {
+            res.status(500).send(err);
+        } else {
+            res.json(movies);
+        }
+    });
+});
+
+
+router.get('/movies/:movieparameter', function (req, res) {
+    Movie.findOne({ title: req.params.movieparameter }, function(err, movie) {
+        if (err) {
+            res.status(500).send(err); // internal server error
+        } else if (!movie) {
+            res.status(404).send({success: false, msg: 'Movie not found.'});
+        } else {
+            res.json(movie);
+        }
+    });
+            
+});        
+
+router.post('/movies', function(req, res) {
+    var movie = new Movie();
+    movie.title = req.body.title;
+    movie.releaseDate = req.body.releaseDate;
+    movie.genre = req.body.genre;
+    movie.actors = req.body.actors;
+
+    movie.save(function(err) {
+        if (err) {
+            res.status(500).send(err);
+        } else {
+            res.json({ success: true, message: 'Movie saved successfully.' });
+        }
+    });
+});
+
+router.put('/movies/:movieparameter', function(req, res) {
+    Movie.findOneAndUpdate({ title: req.params.movieparameter }, req.body, function(err, movie) {
+        if (err) {
+            res.status(500).send(err);
+        } else if (!movie) {
+            res.status(404).send({success: false, msg: 'Movie not found.'});
+        } else {    
+            res.json({ success: true, message: 'Movie updated successfully.' });
+        }
+    });
+});
+
+router.delete('/movies/:movieparameter', function(req, res) {
+    Movie.findOneAndDelete({ title: req.params.movieparameter }, function(err, movie) {
+        if (err) {
+            res.send(err);
+        } else if (!movie) {
+            res.status(404).json({ success: false, message: 'Movie not found.' });
+        } else {
+            res.json({ success: true, message: 'Movie deleted successfully.' });
+        }
+    });
+});    
+
+router.all('/movies', function(req, res) {
+    res.status(405).send({success: false, msg: 'Method not allowed.'});
+});
+
+router.all('/signup', function(req, res) {
+    res.status(405).send({success: false, msg: 'Method not allowed.'});
+});
+
+router.all('/signin', function(req, res) {
+    res.status(405).send({success: false, msg: 'Method not allowed.'});
+});
+
+router.all('/', function(req, res) {
+    res.status(405).send({success: false, msg: 'Method not allowed.'});
+}); // catch all other routes
+
+
 
 app.use('/', router);
 app.listen(process.env.PORT || 8080);
