@@ -99,12 +99,6 @@ router.all('/', function(req, res) {
     res.status(405).send({success: false, msg: 'Method not allowed.'});
 });
 
-router.all('/', function(req, res) {
-    res.status(405).send({success: false, msg: 'Method not allowed.'});
-}); // catch all other routes
-
-
-
 app.use('/', router);
 app.use('/movies', moviesRouter);
 app.use('/users', usersRouter);
